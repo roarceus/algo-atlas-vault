@@ -31,3 +31,16 @@ algo-atlas-vault/
 ## Generated with
 
 [AlgoAtlas](https://github.com/roarceus/algo-atlas) - LeetCode solution documentation generator powered by Claude AI.
+
+<!-- STATS:START -->
+## Statistics
+
+| Difficulty | Count | Percentage |
+|------------|-------|------------|
+| Easy | 1 | 100% |
+| Medium | 0 | 0% |
+| Hard | 0 | 0% |
+| **Total** | **1** | **100%** |
+
+*Last updated: 2026-02-02*
+<!-- STATS:END -->
