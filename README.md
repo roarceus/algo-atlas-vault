@@ -37,10 +37,10 @@ algo-atlas-vault/
 
 | Difficulty | Count | Percentage |
 |------------|-------|------------|
-| Easy | 1 | 100% |
+| Easy | 2 | 100% |
 | Medium | 0 | 0% |
 | Hard | 0 | 0% |
-| **Total** | **1** | **100%** |
+| **Total** | **2** | **100%** |
 
 *Last updated: 2026-02-02*
 <!-- STATS:END -->
