@@ -3,40 +3,39 @@
 ## Overview
 - **Difficulty**: Easy
 - **Topics**: Array, Hash Table
-- **LeetCode Link**: https://leetcode.com/problems/two-sum/
+- **LeetCode Link**: [Problem](https://leetcode.com/problems/two-sum/)
 
 ## Problem Statement
-Given an array of integers and a target value, find the indices of two numbers that add up to the target. Each input has exactly one valid solution, and the same element cannot be used twice.
+Given an array of integers and a target value, find the indices of two numbers that add up to the target. Each input has exactly one solution, and the same element cannot be used twice. The answer can be returned in any order.
 
 ## Prerequisites
-- Hash Table fundamentals (insertion and O(1) lookup)
-- Understanding of complement calculation (target - current = needed value)
+- Hash Table fundamentals (insertion and O(1) average-case lookup)
+- Complement technique: reframing "find two numbers that sum to target" as "for each number, check if target minus that number exists"
 - Array traversal with index tracking using enumerate
-- Dictionary/map data structure usage in Python
+- Understanding of trade-offs between brute-force O(n^2) and hash-map-based O(n) approaches
 
 ## Approach
-This solution uses a Hash Table approach with single-pass traversal. Instead of checking every pair of numbers (which would be O(n^2)), we use a dictionary to store numbers we have already seen along with their indices.
+This solution uses the **Hash Map (One-Pass)** technique. The core idea is to iterate through the array once, and for each element, compute its complement (target minus the current number). If the complement already exists in the hash map, we have found our pair and return their indices immediately. Otherwise, we store the current number and its index in the hash map for future lookups.
 
-For each number in the array, we calculate its complement (target minus the current number). If the complement exists in our dictionary, we have found our answer. If not, we store the current number and its index in the dictionary for future lookups.
+The one-pass approach works because by the time we reach the second number in any valid pair, the first number has already been stored in the hash map during an earlier iteration. This eliminates the need for a second loop or nested iteration entirely.
 
-This approach works because if two numbers a and b sum to the target, when we encounter b, we will have already stored a in our dictionary (or vice versa). The hash table provides O(1) lookup time, making the overall solution linear.
+This strategy transforms the problem from a nested search into a single linear scan with constant-time lookups, making it both time-efficient and straightforward to implement.
 
 ## Visual Example
 ```
-Input: nums = [2,7,11,15], target = 9
+Input: nums = [2, 7, 11, 15], target = 9
 
 Step 1: i=0, num=2
         complement = 9 - 2 = 7
-        seen = {}
-        7 not in seen
-        Add current number to seen
-        seen = {2: 0}
+        numMap = {}
+        7 not in numMap --> store current number
+        numMap = {2: 0}
 
 Step 2: i=1, num=7
         complement = 9 - 7 = 2
-        seen = {2: 0}
-        2 IS in seen at index 0
-        Found pair! Return [seen[2], 1] = [0, 1]
+        numMap = {2: 0}
+        2 IS in numMap --> found pair!
+        Return [numMap[2], 1] = [0, 1]
 
 Output: [0, 1]
 ```
@@ -44,53 +43,39 @@ Output: [0, 1]
 ## Complexity Analysis
 
 ### Time Complexity: O(n)
-We traverse the array exactly once, and each lookup and insertion in the hash table takes O(1) average time. Therefore, the total time complexity is O(n) where n is the length of the input array.
+We traverse the array exactly once, performing a single pass through all n elements. Each hash map lookup and insertion operation takes O(1) on average, so the total time is O(n).
 
 ### Space Complexity: O(n)
-In the worst case, we might need to store almost all n elements in the hash table before finding the solution. This happens when the two numbers that sum to target are at the end of the array.
+In the worst case, we store nearly all n elements in the hash map before finding the answer (e.g., the valid pair is at the very end of the array). Therefore, the space used by the hash map is O(n).
 
 ## Step-by-Step Code Walkthrough
+1. **Initialize an empty hash map** (`numMap = {}`): This will store each number as a key and its index as the value, allowing O(1) lookups.
 
-**Initialize the hash table:**
-```python
-seen = {}
-```
-Create an empty dictionary to store numbers we have encountered and their indices.
+2. **Iterate through the array with index tracking** (`for i, num in enumerate(nums)`): Using `enumerate` gives us both the index `i` and the value `num` at each step.
 
-**Iterate through the array:**
-```python
-for i, n in enumerate(nums):
-```
-Use enumerate to get both the index and value at each position.
+3. **Compute the complement** (`diff = target - num`): For the current number, calculate what value is needed to reach the target sum.
 
-**Calculate and check complement:**
-```python
-complement = target - n
-if complement in seen:
-    return [seen[complement], i]
-```
-For each number, calculate what value we need to reach the target. If that value exists in our dictionary, return both indices.
+4. **Check if the complement exists in the map** (`if diff in numMap`): If the complement was seen in a previous iteration, we have found the two indices that form the solution.
 
-**Store current number:**
-```python
-seen[n] = i
-```
-If no match found, store the current number and its index for future reference.
+5. **Return the result** (`return [numMap[diff], i]`): Return the index of the complement (stored earlier) and the current index.
 
-**Handle no solution case:**
-```python
-return []
-```
-Return empty list if no valid pair exists (though problem guarantees one exists).
+6. **Store the current number** (`numMap[num] = i`): If the complement was not found, add the current number and its index to the map for future lookups.
 
 ## Key Insights
-- The complement relationship is symmetric: if a + b = target, then both a and b are complements of each other
-- Storing the index along with the value allows us to return positions, not just the values themselves
-- We check for the complement before adding the current number to avoid using the same element twice
-- Single-pass solution is possible because we only need to find one pair, and order of discovery does not matter
+- The complement technique converts a two-variable search problem into a single-variable lookup: instead of asking "do any two numbers sum to target?", we ask "have I already seen target minus this number?"
+- Storing numbers as we go (one-pass) is sufficient because when we encounter the second number in a valid pair, the first number is guaranteed to already be in the map.
+- The hash map provides O(1) average lookup, which is what brings the solution down from O(n^2) to O(n).
+- The problem guarantees exactly one valid answer, so we can return immediately upon finding a match without worrying about duplicates or multiple solutions.
 
 ## Common Pitfalls
-- Using the same element twice by checking after adding to the dictionary instead of before
-- Returning values instead of indices
-- Using a nested loop approach that results in O(n^2) time complexity
-- Not handling duplicate values correctly (the hash table naturally handles this since we check before inserting)
+- **Using the same element twice**: If you check the map before confirming the indices are different, you might incorrectly match an element with itself (e.g., target=4 with nums=[2,3] checking index 0 against itself). The one-pass approach naturally avoids this since we only check against previously stored elements.
+- **Inserting before checking**: If you add the current number to the map before checking for its complement, you risk matching the element with itself when the complement equals the current number (e.g., nums=[3,3], target=6). Always check first, then insert.
+- **Assuming sorted input**: The array is not guaranteed to be sorted, so two-pointer approaches that require sorting would change the original indices and need extra bookkeeping.
+- **Not considering negative numbers**: The input can include negative values (constraints allow -10^9 to 10^9), so the solution must not make assumptions about positive-only inputs.
+
+---
+
+I wasn't able to write the file due to permission restrictions. The content above follows the exact structure required by your project's `build_readme_content()` pattern. To save it, you can either:
+
+1. Grant write permissions when prompted, and I'll retry
+2. Copy the content above into `algo-atlas-vault/Easy/1. Two Sum/README.md` manually
