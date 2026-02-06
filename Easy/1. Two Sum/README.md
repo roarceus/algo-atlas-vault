@@ -3,40 +3,36 @@
 ## Overview
 - **Difficulty**: Easy
 - **Topics**: Array, Hash Table
-- **LeetCode Link**: https://leetcode.com/problems/two-sum/
+- **LeetCode Link**: https://leetcode.com/problems/two-sum
 
 ## Problem Statement
-Given an array of integers and a target value, find the indices of two numbers that add up to the target. Each input has exactly one valid solution, and the same element cannot be used twice.
+Given an array of integers and a target value, find two numbers in the array that add up to the target and return their indices. Each input has exactly one solution, and the same element cannot be used twice.
 
 ## Prerequisites
-- Hash Table fundamentals (insertion and O(1) lookup)
-- Understanding of complement calculation (target - current = needed value)
-- Array traversal with index tracking using enumerate
-- Dictionary/map data structure usage in Python
+- Hash Table fundamentals (insertion, lookup in constant time)
+- Understanding of the complement technique (target - current = needed value)
+- Array traversal with index tracking using enumeration
 
 ## Approach
-This solution uses a Hash Table approach with single-pass traversal. Instead of checking every pair of numbers (which would be O(n^2)), we use a dictionary to store numbers we have already seen along with their indices.
+This solution uses a **Hash Map (One-Pass)** approach. Instead of checking every pair of numbers with a brute-force nested loop, we use a hash map to store numbers we have already seen along with their indices. For each number in the array, we calculate its complement (target minus the current number) and check if that complement already exists in our hash map.
 
-For each number in the array, we calculate its complement (target minus the current number). If the complement exists in our dictionary, we have found our answer. If not, we store the current number and its index in the dictionary for future lookups.
-
-This approach works because if two numbers a and b sum to the target, when we encounter b, we will have already stored a in our dictionary (or vice versa). The hash table provides O(1) lookup time, making the overall solution linear.
+By performing the lookup and insertion in a single pass through the array, we avoid the need for a second loop entirely. When we encounter a number whose complement is already stored in the map, we immediately return the indices of both numbers. This reduces the time complexity from O(n^2) to O(n) at the cost of O(n) extra space for the hash map.
 
 ## Visual Example
 ```
-Input: nums = [2,7,11,15], target = 9
+Input: nums = [2, 7, 11, 15], target = 9
 
 Step 1: i=0, num=2
         complement = 9 - 2 = 7
-        seen = {}
-        7 not in seen
-        Add current number to seen
-        seen = {2: 0}
+        numMap = {}
+        7 not in numMap --> add current num to map
+        numMap = {2: 0}
 
 Step 2: i=1, num=7
         complement = 9 - 7 = 2
-        seen = {2: 0}
-        2 IS in seen at index 0
-        Found pair! Return [seen[2], 1] = [0, 1]
+        numMap = {2: 0}
+        2 IS in numMap --> found a match!
+        Return [numMap[2], 1] = [0, 1]
 
 Output: [0, 1]
 ```
@@ -44,53 +40,52 @@ Output: [0, 1]
 ## Complexity Analysis
 
 ### Time Complexity: O(n)
-We traverse the array exactly once, and each lookup and insertion in the hash table takes O(1) average time. Therefore, the total time complexity is O(n) where n is the length of the input array.
+We traverse the array once, performing a single pass through all n elements. Each hash map lookup and insertion operation takes O(1) on average, so the overall time complexity is O(n).
 
 ### Space Complexity: O(n)
-In the worst case, we might need to store almost all n elements in the hash table before finding the solution. This happens when the two numbers that sum to target are at the end of the array.
+In the worst case, we store almost all n elements in the hash map before finding the answer. This occurs when the matching pair is at the end of the array, requiring O(n) additional space.
 
 ## Step-by-Step Code Walkthrough
 
-**Initialize the hash table:**
+**1. Initialize the hash map:**
 ```python
-seen = {}
+numMap = {}
 ```
-Create an empty dictionary to store numbers we have encountered and their indices.
+This dictionary will store each number as a key and its index as the value.
 
-**Iterate through the array:**
+**2. Iterate through the array with index tracking:**
 ```python
-for i, n in enumerate(nums):
+for i, num in enumerate(nums):
 ```
-Use enumerate to get both the index and value at each position.
+We use `enumerate` to get both the index `i` and the value `num` at each position.
 
-**Calculate and check complement:**
+**3. Calculate the complement:**
 ```python
-complement = target - n
-if complement in seen:
-    return [seen[complement], i]
+diff = target - num
 ```
-For each number, calculate what value we need to reach the target. If that value exists in our dictionary, return both indices.
+For each number, we compute what value we need to find in order to reach the target.
 
-**Store current number:**
+**4. Check if the complement exists in the map:**
 ```python
-seen[n] = i
+if diff in numMap:
+    return [numMap[diff], i]
 ```
-If no match found, store the current number and its index for future reference.
+If the complement has already been seen, we return the stored index of the complement and the current index.
 
-**Handle no solution case:**
+**5. Store the current number in the map:**
 ```python
-return []
+numMap[num] = i
 ```
-Return empty list if no valid pair exists (though problem guarantees one exists).
+If no match is found yet, we record the current number and its index for future lookups.
 
 ## Key Insights
-- The complement relationship is symmetric: if a + b = target, then both a and b are complements of each other
-- Storing the index along with the value allows us to return positions, not just the values themselves
-- We check for the complement before adding the current number to avoid using the same element twice
-- Single-pass solution is possible because we only need to find one pair, and order of discovery does not matter
+- The hash map trades space for time, turning an O(n^2) brute-force search into an O(n) single-pass solution
+- By storing numbers as we go, we only need one pass instead of two separate passes (one to build the map, one to query it)
+- The complement relationship (target - num) transforms the problem from "find two numbers that sum to target" into "for each number, check if we have already seen its partner"
+- Inserting after checking prevents using the same element twice, since the current element is not yet in the map when we do the lookup
 
 ## Common Pitfalls
-- Using the same element twice by checking after adding to the dictionary instead of before
-- Returning values instead of indices
-- Using a nested loop approach that results in O(n^2) time complexity
-- Not handling duplicate values correctly (the hash table naturally handles this since we check before inserting)
+- Using the same element twice (e.g., if target is 6 and the array contains a single 3, checking 3 against itself). The one-pass approach avoids this by inserting after checking.
+- Returning values instead of indices. The problem asks for the positions in the array, not the numbers themselves.
+- Assuming the array is sorted. The input is not guaranteed to be sorted, which rules out a simple two-pointer approach without sorting first (and sorting would lose the original indices).
+- Handling duplicate values incorrectly. When the same number appears twice (e.g., [3, 3] with target 6), the hash map overwrites the first index, but the one-pass approach catches the match before the overwrite happens.
