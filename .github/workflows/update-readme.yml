@@ -1,0 +1,35 @@
+name: Update README
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "Easy/**"
+      - "Medium/**"
+      - "Hard/**"
+
+jobs:
+  update-readme:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Regenerate README stats and topic index
+        run: python .github/scripts/update_readme.py
+
+      - name: Commit changes
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git diff --quiet README.md && exit 0
+          git add README.md
+          git commit -m "docs: update vault stats and topic index"
+          git push
