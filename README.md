@@ -18,16 +18,6 @@ algo-atlas-vault/
     └── ...
 ```
 
-## Stats
-
-<!-- Stats will be auto-updated -->
-| Difficulty | Count |
-|------------|-------|
-| Easy       | 0     |
-| Medium     | 0     |
-| Hard       | 0     |
-| **Total**  | **0** |
-
 ## Generated with
 
 [AlgoAtlas](https://github.com/roarceus/algo-atlas) - LeetCode solution documentation generator powered by Claude AI.
